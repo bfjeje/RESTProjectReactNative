@@ -9,24 +9,34 @@ import {
 } from 'react-native';
 
 import axios from 'axios';
-
+import {useNavigation} from '@react-navigation/native';
+// PUT cria um novo usuario se o ID nao for achado, e alem disso sobrescreve
+// toda a entrada desse usuario, caso a gente passar só 1 atributo. O PATCH só
+// reemplaza esse atributo, e mantem os outros
 const Home = () => {
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
   const [users, setUsers] = useState([]);
+  const navigation = useNavigation();
   useEffect(() => {
+    getUsers();
+  }, []);
+  const getUsers = () => {
     axios
       .get('http://192.168.0.2:3000/users')
       .then(req => setUsers(req.data))
       .catch(err => console.log(err));
-  }, []);
+  };
   const saveUser = () => {
     axios
       .post('http://192.168.0.2:3000/users', {name: name, location: location})
-      .then(data => {
+      .then(() => {
         // console.log(JSON.stringify(data.data));
-        const temp = [...users, data.data];
-        setUsers(temp);
+        // const temp = [...users, data.data];
+        // setUsers(temp);
+        // setName('');
+        // setLocation('');
+        getUsers();
         alert('Usuario salvo com sucesso');
       })
       .catch(error => {
@@ -38,10 +48,11 @@ const Home = () => {
     axios
       .delete('http://192.168.0.2:3000/users/' + id)
       .then(() => {
-        const temp = users.filter(item => {
-          return item.id !== id;
-        });
-        setUsers(temp);
+        // const temp = users.filter(item => {
+        //   return item.id !== id;
+        // });
+        // setUsers(temp);
+        getUsers();
         alert('Deletado com sucesso!');
       })
       .catch(error => alert('Error: ' + error));
@@ -64,6 +75,7 @@ const Home = () => {
         <Text style={styles.txtButton}>Cadastrar</Text>
       </TouchableOpacity>
       <FlatList
+        keyExtractor={(item, index) => item.id.toString()}
         data={users}
         renderItem={({item}) => (
           <View
@@ -72,7 +84,10 @@ const Home = () => {
               justifyContent: 'space-between',
               marginHorizontal: 10,
             }}>
-            <Text>{item.name}</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Details', {user: item})}>
+              <Text>{item.name}</Text>
+            </TouchableOpacity>
             <Text onPress={() => deleteUser(item.id)} style={{color: 'red'}}>
               Apagar
             </Text>
