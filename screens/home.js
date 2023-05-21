@@ -13,22 +13,17 @@ import axios from 'axios';
 const Home = () => {
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
-  // useEffect(() => {
-  //
-  // }, []);
-
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    axios
+      .get('http://192.168.0.2:3000/users')
+      .then(req => setUsers(req.data))
+      .catch(err => console.log(err));
+  }, []);
   const saveUser = () => {
-    try {
-      console.log('test');
-      axios
-        .get('http://10.0.2.2:3000/users')
-        .then(req => console.log(req.data))
-        .catch(err => console.log(err.response));
-    } catch (e) {
-      console.log(e.response);
-    }
-    // alert('Nome: ' + name + '-' + location);
+    alert('Nome: ' + name + '-' + location);
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>CRUD USUARIOS</Text>
@@ -45,7 +40,10 @@ const Home = () => {
       <TouchableOpacity style={styles.button} onPress={saveUser}>
         <Text style={styles.txtButton}>Cadastrar</Text>
       </TouchableOpacity>
-      <FlatList data={null} renderItem={() => <Text>Usuario</Text>} />
+      <FlatList
+        data={users}
+        renderItem={({item}) => <Text>{item.name}</Text>}
+      />
     </View>
   );
 };
