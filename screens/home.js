@@ -34,6 +34,19 @@ const Home = () => {
       });
   };
 
+  const deleteUser = id => {
+    axios
+      .delete('http://192.168.0.2:3000/users/' + id)
+      .then(() => {
+        const temp = users.filter(item => {
+          return item.id !== id;
+        });
+        setUsers(temp);
+        alert('Deletado com sucesso!');
+      })
+      .catch(error => alert('Error: ' + error));
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>CRUD USUARIOS</Text>
@@ -52,7 +65,19 @@ const Home = () => {
       </TouchableOpacity>
       <FlatList
         data={users}
-        renderItem={({item}) => <Text>{item.name}</Text>}
+        renderItem={({item}) => (
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginHorizontal: 10,
+            }}>
+            <Text>{item.name}</Text>
+            <Text onPress={() => deleteUser(item.id)} style={{color: 'red'}}>
+              Apagar
+            </Text>
+          </View>
+        )}
       />
     </View>
   );
