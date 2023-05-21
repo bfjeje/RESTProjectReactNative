@@ -21,7 +21,17 @@ const Home = () => {
       .catch(err => console.log(err));
   }, []);
   const saveUser = () => {
-    alert('Nome: ' + name + '-' + location);
+    axios
+      .post('http://192.168.0.2:3000/users', {name: name, location: location})
+      .then(data => {
+        // console.log(JSON.stringify(data.data));
+        const temp = [...users, data.data];
+        setUsers(temp);
+        alert('Usuario salvo com sucesso');
+      })
+      .catch(error => {
+        alert('Error: ' + error);
+      });
   };
 
   return (
